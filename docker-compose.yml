@@ -1,0 +1,40 @@
+version: "3.3"
+   
+services:
+  db:
+    container_name: exp_db
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=teste-django-docker
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports: 
+      - 5465:5432
+    networks:
+      - exp
+
+  web:
+    container_name: exp_web
+    build: .
+    volumes:
+      - .:/home/app
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env
+
+    depends_on:
+      - db
+    networks:
+      - exp
+
+networks:
+  exp:
+    driver: bridge
+
+volumes:
+  # Cria o volume em /var/lib/docker/volumes/experiment_pgdata/_data
+  pgdata:
